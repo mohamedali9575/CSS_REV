@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>دليل شرح مشروع CSS: نادي القراءة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F6; --surface:#FBFCFD; --surface-2:#E4E9EF; --ink:#1B2433; --muted:#5A6578;
+  --line:#D5DCE4; --accent:#E8A33D; --accent-ink:#1B2433; --teal:#2F6F73; --teal-soft:#D9E6E6;
+  --side:#1B2433; --side-ink:#C9D1DC; --side-active:#2A3650;
+  --code-bg:#1B2433; --code-ink:#E6EAF0;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121822; --surface:#1A2230; --surface-2:#232D3D; --ink:#E6EAF0; --muted:#9AA6B5;
+    --line:#2E3A4D; --teal:#7CC4C8; --teal-soft:#1F3436; --side:#0D121A; --side-ink:#AEB8C6; --side-active:#1F2939;
+    --code-bg:#0D121A; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121822; --surface:#1A2230; --surface-2:#232D3D; --ink:#E6EAF0; --muted:#9AA6B5;
+  --line:#2E3A4D; --teal:#7CC4C8; --teal-soft:#1F3436; --side:#0D121A; --side-ink:#AEB8C6; --side-active:#1F2939;
+  --code-bg:#0D121A; color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Cairo",Tahoma,sans-serif;line-height:1.7;font-size:17px}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.app{display:grid;grid-template-columns:300px 1fr;height:100%}
+/* ===== الأجندة الجانبية ===== */
+.side{background:var(--side);color:var(--side-ink);overflow-y:auto;padding:24px 16px 32px}
+.side h1{font-size:20px;color:#F2F4F7;margin:0 8px 4px;line-height:1.4}
+.side .sub{font-size:14px;margin:0 8px 20px;color:var(--side-ink)}
+.group{font-size:13px;font-weight:700;color:var(--accent);margin:20px 8px 6px}
+.toc{list-style:none;margin:0;padding:0}
+.toc button{display:flex;gap:10px;align-items:baseline;width:100%;text-align:right;background:none;border:0;color:var(--side-ink);padding:7px 10px;border-radius:8px;line-height:1.5}
+.toc button:hover{background:var(--side-active);color:#F2F4F7}
+.toc button[aria-current="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.toc .n{font-family:"IBM Plex Mono",monospace;font-size:13px;opacity:.75;min-width:22px}
+
+/* ===== الجزء الرئيسي ===== */
+.main{display:flex;flex-direction:column;min-width:0;height:100%}
+.topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:12px 28px;background:var(--surface);border-bottom:1px solid var(--line)}
+.menu-btn{display:none;background:var(--surface-2);border:0;border-radius:8px;padding:6px 12px;color:var(--ink);font-size:20px}
+.crumb{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);font-size:15px}
+.crumb b{color:var(--ink)}
+.count{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--muted)}
+.navbtn{background:var(--surface-2);border:0;border-radius:999px;padding:6px 16px;color:var(--ink);font-weight:600}
+.navbtn.primary{background:var(--accent);color:var(--accent-ink)}
+.navbtn:disabled{opacity:.4;cursor:default}
+.progress{height:4px;background:var(--surface-2)}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.scroll{flex:1;overflow-y:auto}
+.slide{max-width:1180px;margin:0 auto;padding:36px 32px 48px}
+.slide .grp{color:var(--teal);font-weight:700;font-size:15px}
+.slide h2{font-size:36px;line-height:1.3;margin:2px 0 16px}
+.intro p{margin:0 0 10px;max-width:75ch}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:20px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.card h3{margin:0 0 6px;font-size:19px;color:var(--teal)}
+.card p{margin:0;color:var(--muted)}
+button.card{text-align:right;color:var(--ink);font-size:16px}
+button.card:hover{border-color:var(--accent)}
+.agenda-group{margin-top:24px}
+.agenda-group h3{font-size:16px;color:var(--muted);margin:0 0 8px}
+.agenda-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.agenda-cards button{display:flex;gap:12px;align-items:baseline;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;text-align:right;color:var(--ink)}
+.agenda-cards button:hover{border-color:var(--accent);background:var(--surface-2)}
+.agenda-cards .n{font-family:"IBM Plex Mono",monospace;color:var(--accent);font-weight:600}
+
+.rows{display:grid;gap:8px;margin:18px 0}
+.row{display:grid;grid-template-columns:minmax(150px,240px) 1fr;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 16px}
+.row code{font-family:"IBM Plex Mono",monospace;color:var(--teal);font-weight:600;unicode-bidi:plaintext;text-align:right;font-size:15px}
+
+.steps-list{list-style:none;padding:0;margin:20px 0;display:grid;gap:12px}
+.steps-list li{display:flex;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.steps-list .dot{flex:none;width:40px;height:40px;border-radius:50%;background:var(--ink);color:var(--accent);display:flex;justify-content:center;align-items:center;font-weight:700}
+:root[data-theme="dark"] .steps-list .dot{background:var(--surface-2)}
+table{border-collapse:collapse;width:100%;max-width:760px;margin:20px 0;background:var(--surface);border-radius:12px;overflow:hidden}
+th,td{padding:10px 16px;border-bottom:1px solid var(--line);text-align:right}
+th{background:var(--surface-2)}
+td.d{text-align:center;font-weight:700;width:90px}
+tr.total td{font-weight:700;background:var(--teal-soft)}
+
+.map{display:grid;gap:8px;max-width:620px;margin:20px 0;padding:12px;border:2px solid var(--ink);border-radius:16px;background:var(--surface)}
+.map div{display:flex;justify-content:space-between;align-items:center;border-radius:8px;padding:0 16px;font-weight:700}
+.map code{font-family:"IBM Plex Mono",monospace;direction:ltr}
+
+/* ===== المعمل: كود + نتيجة ===== */
+.lab{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;align-items:start}
+.lab.tall{grid-template-columns:1fr}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-width:0}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 12px;background:var(--surface-2)}
+.bar .label{flex:1;font-weight:700;font-size:15px}
+.tool{border:0;border-radius:8px;padding:5px 14px;font-weight:600;background:var(--surface);color:var(--ink)}
+.tool.run{background:var(--accent);color:var(--accent-ink)}
+.tool[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+textarea.code{display:block;width:100%;min-height:360px;resize:vertical;border:0;margin:0;padding:16px 18px;background:var(--code-bg);color:var(--code-ink);font-family:"IBM Plex Mono",monospace;font-size:14.5px;line-height:1.6;direction:ltr;text-align:left;tab-size:2;white-space:pre}
+.lab.tall textarea.code{min-height:420px}
+.preview-wrap{overflow:hidden;background:#FFFFFF}
+.preview-wrap iframe{display:block;border:0;background:#FFFFFF;transform-origin:top right}
+.hint{margin-top:14px;background:var(--teal-soft);border-radius:12px;padding:12px 16px}
+.hint b{color:var(--teal)}
+details.notes{margin-top:14px;background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:10px 16px}
+details.notes summary{cursor:pointer;font-weight:700}
+details.notes p{margin:8px 0 0;color:var(--muted)}
+.bottom-nav{display:flex;justify-content:space-between;gap:16px;margin-top:36px;padding-top:20px;border-top:1px solid var(--line)}
+.bottom-nav button{flex:1;max-width:48%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;color:var(--ink);text-align:right}
+.bottom-nav button:hover{border-color:var(--accent)}
+.bottom-nav .next{text-align:left}
+.bottom-nav small{display:block;color:var(--muted)}
+.toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:8px 20px;border-radius:999px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.scrim{display:none}
+
+@media (max-width: 900px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;top:0;bottom:0;right:0;width:290px;z-index:20;transform:translateX(100%);transition:transform .25s;padding-top:calc(24px + env(safe-area-inset-top,0px))}
+  .side.open{transform:none}
+  .scrim.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:15}
+  .menu-btn{display:block}
+  .lab{grid-template-columns:1fr}
+  .slide{padding:24px 18px 40px}
+  .slide h2{font-size:28px}
+  .row{grid-template-columns:1fr;gap:2px}
+  .topbar{padding:10px 14px}
+  .navbtn span{display:none}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side" aria-label="الأجندة">
+    <h1>مشروع CSS: نادي القراءة</h1>
+    <p class="sub">دليل الشرح خطوة بخطوة</p>
+    <nav id="toc"></nav>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <main class="main">
+    <div class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="افتح الأجندة">☰</button>
+      <div class="crumb" id="crumb"></div>
+      <span class="count" id="count"></span>
+      <button class="navbtn" id="prevBtn" aria-label="السابق">→ <span>السابق</span></button>
+      <button class="navbtn primary" id="nextBtn" aria-label="التالي"><span>التالي</span> ←</button>
+    </div>
+    <div class="progress"><i id="prog"></i></div>
+    <div class="scroll" id="scroll"><article class="slide" id="slide"></article></div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const T = [{"id": "agenda", "group": "البداية", "title": "الأجندة", "kind": "agenda", "intro": ["اختار أي موضوع من الكروت دي أو من القايمة اللي على الجنب، وهيوديك عليه على طول."], "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}"}, {"id": "goal", "group": "المفاهيم", "title": "المشروع ده عن إيه", "intro": ["الطالب هياخد ملف HTML جاهز. كل شغله إنه يكتب ملف style.css يحول الصفحة من كلام سادة لصفحة شكلها حلو وبتشتغل على الموبايل."], "cards": [["هيبني إيه", "صفحة لنادي قراءة فيها نافبار، غلاف كتاب، 6 كروت كتب، 3 خطوات اشتراك، وفوتر"], ["هيتعلم إيه", "الـ Box Model، الـ Flexbox، الـ Grid، الـ hover والحركة، والـ Responsive للموبايل"], ["هياخد قد إيه", "3 لـ 4 حصص. كل حصة خطوتين، وبعد كل خطوة يحفظ ويعمل Refresh ويشوف النتيجة"]], "notes": "المشروع متقسم 8 خطوات، كل خطوة بتلون جزء من الصفحة. فولدر starter يتدي للطالب، وفولدر solution فيه الحل وكل سطر عليه شرح. افتح سلايد «الصفحة كاملة» واعمل تشغيل عشان الطالب يشوف هو رايح فين.", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}"}, {"id": "html-css", "group": "المفاهيم", "title": "HTML و CSS: الحيطان والدهان", "intro": ["HTML زي طوب البيت وحيطانه: بيقول فيه عنوان هنا، فقرة هنا، زرار هنا.", "CSS زي الدهان والفرش: الألوان، المقاسات، المسافات، ومين جنب مين.", "جرب: امسح كل الكود اللي تحت واعمل تشغيل، هتلاقي الصفحة رجعت كلام سادة. وبعدين دوس «رجوع للأصل»."], "html": "<h1>نادي القراءة<\/h1>\n<p>كل أسبوع كتاب جديد<\/p>\n<a href=\"#\" class=\"btn\">اشترك<\/a>", "code": "h1 {\n  color: #2F6F73;\n  font-size: 40px;\n}\np {\n  color: #5A6578;\n}\n.btn {\n  background-color: #E8A33D;\n  padding: 10px 24px;\n  border-radius: 999px;\n  display: inline-block;\n  margin-top: 12px;\n}", "base": "body{font-family:'Cairo',Tahoma,sans-serif;padding:20px}", "notes": "الملفين بيتربطوا بسطر واحد في الـ HTML: <link rel=\"stylesheet\" href=\"style.css\">. لو السطر ده غلط أو اسم الملف مختلف، مفيش أي CSS هيشتغل."}, {"id": "rule", "group": "المفاهيم", "title": "شكل أي قاعدة في CSS", "intro": ["كل ملف CSS عبارة عن قواعد شبه دي مكررة. اقراها كده: «خلي لون كل عناوين h1 أحمر».", "والـ ; في الآخر زي النقطة في آخر الجملة، ولو اتنسيت السطر اللي بعدها مش هيشتغل."], "rows": [["h1", "الـ Selector: مين؟ العنصر اللي هنغير شكله"], ["color", "الـ Property: إيه؟ الحاجة اللي هنغيرها"], ["red", "الـ Value: القيمة الجديدة"]], "html": "<h1>أنا عنوان<\/h1>", "code": "h1 {\n  color: red;\n}", "hint": "غير red لـ blue أو green واعمل تشغيل. وبعدين امسح الـ ; وزود سطر font-size: 60px; تحته وشوف هيشتغل ولا لأ.", "notes": "علم الطالب يقرا أي قاعدة بصوت عالي: خلي [الـ property] بتاع [الـ selector] = [الـ value]. مثال: .btn { padding: 12px; } تتقري: خلي المسافة الداخلية بتاعة الزرار 12 بكسل.", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}"}, {"id": "selectors", "group": "المفاهيم", "title": "إزاي بنختار العنصر", "intro": ["الـ class هو الكوبري بين الملفين: في الـ HTML بنكتب class=\"btn\"، وفي الـ CSS بنكتب .btn. النقطة قبل الاسم معناها class، والاسم لازم يبقى نفسه حرف بحرف."], "rows": [["*", "كل العناصر في الصفحة"], ["h1", "كل عناوين h1"], [".btn", "أي عنصر عليه class اسمه btn"], [".menu a", "أي لينك جوه menu"], ["a:hover", "اللينك وقت ما الماوس يقف عليه"]], "html": "<h1>عنوان<\/h1>\n<ul class=\"menu\">\n  <li><a href=\"#\">لينك جوه القايمة<\/a><\/li>\n<\/ul>\n<a href=\"#\">لينك بره القايمة<\/a>\n<br><br>\n<a href=\"#\" class=\"btn\">زرار<\/a>", "code": "h1 {\n  color: #2F6F73;\n}\n.menu a {\n  color: #B5523B;\n}\n.btn {\n  background-color: #E8A33D;\n  padding: 8px 20px;\n  border-radius: 8px;\n}\na:hover {\n  text-decoration: underline;\n}", "hint": "لاحظ إن .menu a لونت اللينك اللي جوه القايمة بس. وقف بالماوس على أي لينك عشان تشوف الـ :hover.", "notes": "الـ selector اللي فيه مسافة زي .menu a معناه: دور جوه الأولاني على التاني.", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}"}, {"id": "box-model", "group": "المفاهيم", "title": "كل عنصر عبارة عن صندوق", "intro": ["زي صورة في برواز: الصورة هي المحتوى، الكرتون الأبيض حواليها هو الـ padding، الخشب هو الـ border، والمسافة بين البرواز والبرواز اللي جنبه هي الـ margin."], "rows": [["content", "المحتوى نفسه: الكلام أو الصورة"], ["padding", "مسافة جوه العنصر، بين المحتوى والإطار"], ["border", "الإطار اللي حوالين العنصر"], ["margin", "مسافة بره العنصر، بينه وبين اللي جنبه"]], "html": "<div class=\"box\">صندوق 1<\/div>\n<div class=\"box\">صندوق 2<\/div>", "code": ".box {\n  background-color: #F6E3C2;\n  padding: 30px;\n  border: 8px solid #2F6F73;\n  margin: 20px;\n}", "hint": "غير الـ padding لـ 5px وبعدين لـ 60px. وغير الـ margin لـ 0 وشوف الصندوقين لزقوا في بعض.", "notes": "كليك يمين على أي عنصر في المتصفح ← Inspect ← تبويب Computed، هتلاقي رسمة الصندوق بالأرقام.", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}"}, {"id": "page-map", "group": "المفاهيم", "title": "خريطة الصفحة", "kind": "map", "intro": ["الصفحة عبارة عن 5 أجزاء فوق بعض. كل جزء ليه class في الـ HTML وخطوة في المشروع. الخطوة 1 والخطوة 3 والخطوة 8 عامة على الصفحة كلها."], "notes": "خلي الطالب يلاقي كل class من دول في index.html قبل ما يبدأ.", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}"}, {"id": "plan", "group": "المفاهيم", "title": "خطة الحصص", "cards": [["الحصة 1", "الخطوة 1 و 2: الأساسيات والنافبار"], ["الحصة 2", "الخطوة 3 و 4: الأزرار والجزء الرئيسي"], ["الحصة 3", "الخطوة 5 و 6: كروت الكتب ودواير الخطوات"], ["الحصة 4", "الخطوة 7 و 8: الفوتر والموبايل، وبعدين التقييم"]], "intro": ["القاعدة الذهبية: اكتب، احفظ بـ Ctrl + S، اعمل Refresh بـ F5، وشوف اتغير إيه قبل ما تكمل."], "notes": "الأفضل الطالب يكتب الكود بإيده مش copy paste، حتى لو أبطأ.", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}"}, {"id": "step1", "group": "الخطوات", "title": "الخطوة 1: الأساسيات", "intro": ["الخطوة دي بتجهز الصفحة كلها. المتصفح بيحط مسافات من عنده، فاحنا بنمسحها ونحدد الخط والألوان."], "rows": [["*", "كل العناصر في الصفحة"], ["margin / padding: 0", "نمسح مسافات المتصفح الجاهزة"], ["box-sizing", "العرض يشمل الـ padding والإطار"], ["font-family", "نوع الخط"], ["background-color", "لون الخلفية"], ["line-height", "المسافة بين السطور"], ["text-decoration", "نشيل الخط اللي تحت اللينك"]], "html": "<h1>نادي القراءة<\/h1>\n<p>كل أسبوع كتاب جديد، وكل كتاب حكاية.<\/p>\n<a href=\"#\">لينك عادي<\/a>", "code": "* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\nbody {\n  font-family: \"Cairo\", Tahoma;\n  background-color: #EEF2F6;\n  color: #1B2433;\n  line-height: 1.7;\n}\na {\n  color: inherit;\n  text-decoration: none;\n}", "base": "", "hint": "امسح القاعدة بتاعة * واعمل تشغيل، هتلاقي مسافات ظهرت حوالين العنوان. وغير لون الخلفية لـ pink.", "notes": "أي عنصر جوه الـ body بياخد الخط واللون تلقائي، وده اسمه وراثة inheritance."}, {"id": "flex", "group": "الخطوات", "title": "الـ Flexbox: نرص الحاجات جنب بعض", "intro": ["الـ flex بيتحط على الأب (الصندوق الكبير)، والولاد اللي جواه هما اللي بيترصوا جنب بعض."], "rows": [["display: flex", "العناصر جنب بعض في صف"], ["justify-content", "بيوزعهم على العرض"], ["align-items", "بيسنترهم من فوق لتحت"]], "html": "<div class=\"bar\">\n  <div class=\"item\">اللوجو<\/div>\n  <div class=\"item\">اللينكات<\/div>\n  <div class=\"item\">الزرار<\/div>\n<\/div>", "code": ".bar {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  background-color: #FFFFFF;\n  padding: 16px;\n  height: 120px;\n}\n.item {\n  background-color: #E8A33D;\n  padding: 10px 20px;\n  border-radius: 8px;\n}", "hint": "جرب space-between تبقى center، وبعدين flex-start. وامسح سطر display: flex وشوف العناصر نزلت تحت بعض.", "notes": "الصفحة عربي فالترتيب بيبدأ من اليمين. flex لما الحاجات في صف واحد، وgrid لما يبقى فيه صفوف وعواميد.", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}"}, {"id": "step2", "group": "الخطوات", "title": "الخطوة 2: النافيجيشن بار", "intro": ["الطالب عمل نافبار قبل كده، فالخطوة دي مراجعة بطريقة الـ flex."], "rows": [["display: flex", "العناصر جنب بعض في صف"], ["justify-content", "توزيعهم على العرض"], ["padding: 16px 48px", "16 فوق وتحت، 48 يمين وشمال"], ["position: sticky", "البار يفضل لازق فوق"], ["gap", "مسافة بين كل لينك والتاني"], ["list-style: none", "نشيل النقط بتاعة القايمة"], [":hover", "اللينك يقلب لونه مع الماوس"]], "html": "<header class=\"navbar\">\n  <a href=\"#\" class=\"logo\">📚 نادي القراءة<\/a>\n  <nav>\n    <ul class=\"nav-links\">\n      <li><a href=\"#\">الرئيسية<\/a><\/li>\n      <li><a href=\"#\">الكتب<\/a><\/li>\n      <li><a href=\"#\">انضم لينا<\/a><\/li>\n    <\/ul>\n  <\/nav>\n  <a href=\"#\" class=\"btn btn-small\">تسجيل الدخول<\/a>\n<\/header>", "code": ".navbar {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  padding: 16px 48px;\n  background-color: #1B2433;\n  color: #FFFFFF;\n  position: sticky;\n  top: 0;\n}\n.logo {\n  font-size: 22px;\n  font-weight: 700;\n}\n.nav-links {\n  display: flex;\n  gap: 32px;\n  list-style: none;\n}\n.nav-links a:hover {\n  color: #E8A33D;\n}", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:0} a{color:inherit;text-decoration:none} .btn{background:#E8A33D;color:#1B2433;padding:8px 20px;border-radius:999px;font-weight:700;font-size:14px}", "hint": "امسح سطر list-style: none وشوف النقط رجعت. وغير الـ gap لـ 8px.", "notes": "القايمة ul جواها li، والـ li بطبيعتها تحت بعض وقبل كل واحدة نقطة. عشان كده عملنا flex تاني على .nav-links."}, {"id": "step3", "group": "الخطوات", "title": "الخطوة 3: الأزرار والحركة", "intro": ["الزرار أصلا لينك a، بس شكلناه. حجمه جاي من الـ padding مش من width."], "rows": [["border-radius: 999px", "أطراف مدورة على الآخر"], [":hover", "لما الماوس يقف عليه"], ["transform", "يطلع لفوق 3 بكسل"], ["transition", "التغيير يحصل بنعومة"], [".btn-small", "class تانية تصغر الزرار"]], "html": "<a href=\"#\" class=\"btn\">اشترك مجانا<\/a>\n&nbsp;&nbsp;\n<a href=\"#\" class=\"btn btn-small\">تسجيل الدخول<\/a>", "code": ".btn {\n  display: inline-block;\n  background-color: #E8A33D;\n  color: #1B2433;\n  font-weight: 700;\n  padding: 12px 28px;\n  border-radius: 999px;\n  transition: transform 0.2s, background-color 0.2s;\n}\n.btn:hover {\n  background-color: #F2B85C;\n  transform: translateY(-3px);\n}\n.btn-small {\n  padding: 8px 20px;\n  font-size: 14px;\n}", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none} body{padding:40px}", "hint": "وقف بالماوس على الزرار. بعدين امسح سطر الـ transition وجرب تاني، هتلاقي الحركة بقت فجأة.", "notes": "الزرار التاني عليه class اتنين: class=\"btn btn-small\"، فبياخد شكل الاتنين."}, {"id": "step4", "group": "الخطوات", "title": "الخطوة 4: الجزء الرئيسي", "intro": ["الغلاف مش صورة، ده div عادي اديناله عرض وارتفاع ولون وظل ولفيناه شوية."], "rows": [["max-width", "أقصى عرض للمحتوى"], ["margin: 0 auto", "يتسنتر في نص الصفحة"], ["flex: 1", "الكلام ياخد المساحة الفاضية"], ["box-shadow", "ظل تحت الغلاف"], ["transform: rotate", "نميل الغلاف 4 درجات"]], "html": "<section class=\"hero\">\n  <div class=\"hero-text\">\n    <h1>كل أسبوع كتاب جديد، وكل كتاب حكاية<\/h1>\n    <p>نادي لطلبة المدارس بيقروا نفس الكتاب في نفس الأسبوع.<\/p>\n  <\/div>\n  <div class=\"book-cover\">\n    <h2>حي بن يقظان<\/h2>\n    <p>ابن طفيل<\/p>\n  <\/div>\n<\/section>", "code": ".hero {\n  display: flex;\n  align-items: center;\n  gap: 48px;\n  max-width: 1100px;\n  margin: 0 auto;\n  padding: 40px 24px;\n}\n.hero-text {\n  flex: 1;\n}\n.hero h1 {\n  font-size: 36px;\n  line-height: 1.3;\n}\n.book-cover {\n  width: 160px;\n  height: 220px;\n  background-color: #2F6F73;\n  color: #FFFFFF;\n  padding: 20px;\n  border-radius: 12px;\n  border-right: 10px solid #24575A;\n  box-shadow: 0 20px 40px rgba(27, 36, 51, 0.3);\n  transform: rotate(-4deg);\n}", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:0} a{color:inherit;text-decoration:none}", "hint": "غير -4deg لـ 10deg. وامسح flex: 1 وشوف الكلام بقى عرضه قد إيه.", "notes": "margin: 0 auto معناها صفر فوق وتحت، وauto يمين وشمال، فالمتصفح بيقسم المساحة الفاضية بالنص."}, {"id": "step5", "group": "الخطوات", "title": "الخطوة 5: كروت الكتب بالـ Grid", "intro": ["تخيل كراسة مربعات: بنقول للمتصفح عايزين 3 عواميد متساوية، وهو يرص الكروت فيهم لوحده. 1fr معناها جزء واحد من المساحة."], "rows": [["display: grid", "نحول المكان لشبكة"], ["repeat(3, 1fr)", "3 عواميد متساوية"], ["gap", "المسافة بين الكروت"], ["border", "إطار: سُمك، نوع، لون"], [":hover + transform", "الكارت يطلع لفوق"], ["card-cover height", "الـ div الفاضي محتاج ارتفاع عشان يبان"]], "html": "<div class=\"books-grid\">\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#2F6F73\"><\/div><h3>الأيام<\/h3><p class=\"author\">طه حسين<\/p><\/article>\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#E8A33D\"><\/div><h3>كليلة ودمنة<\/h3><p class=\"author\">ابن المقفع<\/p><\/article>\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#6B4E71\"><\/div><h3>حي بن يقظان<\/h3><p class=\"author\">ابن طفيل<\/p><\/article>\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#B5523B\"><\/div><h3>رحلة ابن بطوطة<\/h3><p class=\"author\">ابن بطوطة<\/p><\/article>\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#34507A\"><\/div><h3>عودة الروح<\/h3><p class=\"author\">توفيق الحكيم<\/p><\/article>\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#6E7F3A\"><\/div><h3>ألف ليلة وليلة<\/h3><p class=\"author\">حكايات شعبية<\/p><\/article>\n<\/div>", "code": ".books-grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 24px;\n}\n.book-card {\n  background-color: #FFFFFF;\n  border: 1px solid #DDE3EA;\n  border-radius: 16px;\n  padding: 20px;\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n.book-card:hover {\n  transform: translateY(-6px);\n  box-shadow: 0 12px 24px rgba(27, 36, 51, 0.12);\n}\n.card-cover {\n  height: 100px;\n  border-radius: 10px;\n  margin-bottom: 12px;\n}\n.author {\n  color: #5A6578;\n}", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}", "hint": "غير الـ 3 لـ 2 أو 4. وجرب solid تبقى dashed.", "notes": "أي كارت زيادة بينزل صف جديد من نفسه، فلو زودنا كارت سابع مش محتاجين نكتب ولا سطر CSS."}, {"id": "step6", "group": "الخطوات", "title": "الخطوة 6: دواير الخطوات", "intro": ["أي مربع لو اديته border-radius: 50% يبقى دايرة. وعشان نحط الرقم في النص بالظبط بنستخدم flex."], "rows": [["width = height", "يبقى مربع"], ["border-radius: 50%", "المربع يتحول دايرة"], ["flex + center", "الرقم في نص الدايرة بالظبط"]], "html": "<ol class=\"steps\">\n  <li class=\"step\"><span class=\"step-number\">1<\/span><h3>اعمل حساب<\/h3><\/li>\n  <li class=\"step\"><span class=\"step-number\">2<\/span><h3>اختار كتاب<\/h3><\/li>\n  <li class=\"step\"><span class=\"step-number\">3<\/span><h3>تعالى الجمعة<\/h3><\/li>\n<\/ol>", "code": ".steps {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 20px;\n  list-style: none;\n}\n.step {\n  background-color: #FFFFFF;\n  border-radius: 16px;\n  padding: 20px;\n}\n.step-number {\n  width: 48px;\n  height: 48px;\n  border-radius: 50%;\n  background-color: #1B2433;\n  color: #E8A33D;\n  font-weight: 700;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}", "hint": "غير الـ height لـ 80px وشوف الدايرة بقت بيضاوي. وغير 50% لـ 10px.", "notes": "flex مع justify-content و align-items الاتنين center أسهل طريقة لتسنتير أي حاجة جوه أي حاجة."}, {"id": "step7", "group": "الخطوات", "title": "الخطوة 7: الفوتر", "intro": ["أسهل خطوة، وفرصة كويسة الطالب يكتبها لوحده من غير ما تقوله الكود."], "rows": [["text-align: center", "الكلام في نص السطر"], ["padding: 24px", "رقم واحد = نفس المسافة من الأربع جهات"], ["font-size", "خط أصغر لأنه أقل أهمية"]], "html": "<footer class=\"footer\">\n  <p>نادي القراءة © 2026 — اتعمل بإيد طالب بيتعلم CSS<\/p>\n<\/footer>", "code": ".footer {\n  background-color: #1B2433;\n  color: #C9D1DC;\n  text-align: center;\n  padding: 24px;\n  font-size: 14px;\n}", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}", "hint": "امسح الكود ده واطلب من الطالب يكتبه من الوصف بس.", "notes": "لو عرف يكتبها لوحده يبقى فهم الخطوات اللي فاتت."}, {"id": "step8", "group": "الخطوات", "title": "الخطوة 8: الصفحة على الموبايل", "intro": ["@media معناها: طبق القواعد اللي جوايا بس لو الشرط صح. max-width: 768px يعني لو الشاشة عرضها 768 بكسل أو أقل.", "استخدم زراير المقاس فوق النتيجة عشان تشوف الصفحة على كمبيوتر وتابلت وموبايل."], "rows": [["max-width: 900px", "تابلت: عمودين"], ["max-width: 768px", "موبايل: عمود واحد"]], "html": "<div class=\"books-grid\">\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#2F6F73\"><\/div><h3>الأيام<\/h3><p class=\"author\">طه حسين<\/p><\/article>\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#E8A33D\"><\/div><h3>كليلة ودمنة<\/h3><p class=\"author\">ابن المقفع<\/p><\/article>\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#6B4E71\"><\/div><h3>حي بن يقظان<\/h3><p class=\"author\">ابن طفيل<\/p><\/article>\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#B5523B\"><\/div><h3>رحلة ابن بطوطة<\/h3><p class=\"author\">ابن بطوطة<\/p><\/article>\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#34507A\"><\/div><h3>عودة الروح<\/h3><p class=\"author\">توفيق الحكيم<\/p><\/article>\n  <article class=\"book-card\"><div class=\"card-cover\" style=\"background:#6E7F3A\"><\/div><h3>ألف ليلة وليلة<\/h3><p class=\"author\">حكايات شعبية<\/p><\/article>\n<\/div>", "widths": true, "code": ".books-grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 16px;\n}\n.book-card {\n  background-color: #FFFFFF;\n  border-radius: 16px;\n  padding: 16px;\n}\n.card-cover {\n  height: 80px;\n  border-radius: 10px;\n}\n\n@media (max-width: 900px) {\n  .books-grid {\n    grid-template-columns: repeat(2, 1fr);\n  }\n}\n@media (max-width: 768px) {\n  .books-grid {\n    grid-template-columns: 1fr;\n  }\n}", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}", "hint": "دوس تابلت وبعدين موبايل وشوف عدد العواميد.", "notes": "جوه @media بنكتب نفس الـ selectors بقيم جديدة، والقيم الجديدة بتكسب لأنها مكتوبة بعد. من المتصفح: F12 ثم Ctrl + Shift + M."}, {"id": "full", "group": "الخطوات", "title": "الصفحة كاملة", "intro": ["ده ملف الحل كله بالشرح بتاعه، شغال على الـ HTML بتاع المشروع. عدل أي حاجة وشوف تأثيرها على الصفحة كلها."], "html": "\n\n  \n  <header class=\"navbar\">\n    <a href=\"#home\" class=\"logo\">📚 نادي القراءة<\/a>\n\n    <nav>\n      <ul class=\"nav-links\">\n        <li><a href=\"#home\">الرئيسية<\/a><\/li>\n        <li><a href=\"#books\">الكتب<\/a><\/li>\n        <li><a href=\"#join\">انضم لينا<\/a><\/li>\n      <\/ul>\n    <\/nav>\n\n    \n    <a href=\"login.html\" class=\"btn btn-small\">تسجيل الدخول<\/a>\n  <\/header>\n\n  \n  <section class=\"hero\" id=\"home\">\n    <div class=\"hero-text\">\n      <h1>كل أسبوع كتاب جديد، وكل كتاب حكاية<\/h1>\n      <p>نادي لطلبة المدارس بيقروا نفس الكتاب في نفس الأسبوع، ويتقابلوا يوم الجمعة يتناقشوا في اللي قروه.<\/p>\n      <a href=\"#join\" class=\"btn\">اشترك مجانا<\/a>\n    <\/div>\n\n    <div class=\"book-of-week\">\n      \n      <div class=\"book-cover\">\n        <h2>حي بن يقظان<\/h2>\n        <p>ابن طفيل<\/p>\n      <\/div>\n      <p class=\"book-label\">كتاب الأسبوع ده<\/p>\n    <\/div>\n  <\/section>\n\n  \n  <section class=\"section\" id=\"books\">\n    <h2 class=\"section-title\">كتب الشهر<\/h2>\n    <p class=\"section-subtitle\">اختار الكتاب اللي يعجبك وابدأ اقرا مع المجموعة<\/p>\n\n    <div class=\"books-grid\">\n      <article class=\"book-card\">\n        <div class=\"card-cover cover-1\"><\/div>\n        <h3>الأيام<\/h3>\n        <p class=\"author\">طه حسين<\/p>\n        <span class=\"level\">متوسط<\/span>\n      <\/article>\n\n      <article class=\"book-card\">\n        <div class=\"card-cover cover-2\"><\/div>\n        <h3>كليلة ودمنة<\/h3>\n        <p class=\"author\">ابن المقفع<\/p>\n        <span class=\"level\">سهل<\/span>\n      <\/article>\n\n      <article class=\"book-card\">\n        <div class=\"card-cover cover-3\"><\/div>\n        <h3>حي بن يقظان<\/h3>\n        <p class=\"author\">ابن طفيل<\/p>\n        <span class=\"level\">متوسط<\/span>\n      <\/article>\n\n      <article class=\"book-card\">\n        <div class=\"card-cover cover-4\"><\/div>\n        <h3>رحلة ابن بطوطة<\/h3>\n        <p class=\"author\">ابن بطوطة<\/p>\n        <span class=\"level\">صعب<\/span>\n      <\/article>\n\n      <article class=\"book-card\">\n        <div class=\"card-cover cover-5\"><\/div>\n        <h3>عودة الروح<\/h3>\n        <p class=\"author\">توفيق الحكيم<\/p>\n        <span class=\"level\">متوسط<\/span>\n      <\/article>\n\n      <article class=\"book-card\">\n        <div class=\"card-cover cover-6\"><\/div>\n        <h3>ألف ليلة وليلة<\/h3>\n        <p class=\"author\">حكايات شعبية<\/p>\n        <span class=\"level\">سهل<\/span>\n      <\/article>\n    <\/div>\n  <\/section>\n\n  \n  <section class=\"section\" id=\"join\">\n    <h2 class=\"section-title\">تنضم إزاي؟<\/h2>\n    <p class=\"section-subtitle\">3 خطوات بس<\/p>\n\n    <ol class=\"steps\">\n      <li class=\"step\">\n        <span class=\"step-number\">1<\/span>\n        <h3>اعمل حساب<\/h3>\n        <p>سجل باسمك وإيميلك من صفحة تسجيل الدخول.<\/p>\n      <\/li>\n      <li class=\"step\">\n        <span class=\"step-number\">2<\/span>\n        <h3>اختار كتاب<\/h3>\n        <p>اختار كتاب من كتب الشهر وابدأ تقرا.<\/p>\n      <\/li>\n      <li class=\"step\">\n        <span class=\"step-number\">3<\/span>\n        <h3>تعالى الجمعة<\/h3>\n        <p>اتكلم عن اللي قريته مع باقي الأعضاء.<\/p>\n      <\/li>\n    <\/ol>\n\n    <div class=\"join-action\">\n      <a href=\"login.html\" class=\"btn\">ابدأ دلوقتي<\/a>\n    <\/div>\n  <\/section>\n\n  \n  <footer class=\"footer\">\n    <p>نادي القراءة © 2026 — اتعمل بإيد طالب بيتعلم CSS<\/p>\n  <\/footer>\n\n", "code": "/* =========================================================\n   مشروع: صفحة نادي القراءة  (ملف الحل)\n   الملف ده فيه كل الشكل بتاع الصفحة.\n   أي كلام مكتوب بين علامة البداية وعلامة النهاية دي اسمه \"تعليق\"\n   والمتصفح بيتجاهله، يعني ده شرح للبني آدم بس.\n\n   شكل أي قاعدة في CSS:\n   الـ selector { الـ property: القيمة; }\n   مثال:  h1 { color: red; }  = \"خلي لون كل العناوين h1 أحمر\"\n   ========================================================= */\n\n\n/* =========================================================\n   الخطوة 1: الأساسيات (بتأثر على الصفحة كلها)\n   ========================================================= */\n\n/* النجمة * معناها \"كل العناصر في الصفحة\" */\n* {\n  margin: 0;               /* نشيل المسافات الخارجية اللي المتصفح بيحطها لوحده */\n  padding: 0;              /* نشيل المسافات الداخلية اللي المتصفح بيحطها لوحده */\n  box-sizing: border-box;  /* العرض اللي بنكتبه يشمل الـ padding والـ border، فالحسابات تبقى أسهل */\n}\n\nbody {\n  font-family: \"Cairo\", Tahoma, sans-serif; /* نوع الخط، ولو Cairo ما اتحملش يستخدم Tahoma */\n  background-color: #EEF2F6;                /* لون خلفية الصفحة كلها (رمادي مزرق فاتح) */\n  color: #1B2433;                           /* لون الكلام الأساسي (كحلي غامق) */\n  line-height: 1.7;                         /* المسافة بين السطور = 1.7 من حجم الخط، القراءة تبقى مريحة */\n}\n\na {\n  color: inherit;          /* inherit = اللينك ياخد نفس لون الكلام اللي حواليه بدل الأزرق */\n  text-decoration: none;   /* نشيل الخط اللي تحت اللينك */\n}\n\n\n/* =========================================================\n   الخطوة 2: النافيجيشن بار\n   ========================================================= */\n\n.navbar {                           /* النقطة . قبل الاسم = class */\n  display: flex;                    /* نخلي العناصر اللي جواه جنب بعض في صف واحد */\n  justify-content: space-between;   /* نوزعهم: واحد في الأول، واحد في الآخر، والباقي في النص */\n  align-items: center;              /* نسنترهم رأسيا (من فوق لتحت) */\n  padding: 16px 48px;               /* 16 بكسل من فوق وتحت، 48 من اليمين والشمال */\n  background-color: #1B2433;        /* خلفية كحلي */\n  color: #FFFFFF;                   /* الكلام أبيض */\n  position: sticky;                 /* البار يفضل ظاهر وانت بتنزل في الصفحة */\n  top: 0;                           /* ويلزق في أعلى الشاشة بالظبط */\n  z-index: 10;                      /* يبقى فوق أي حاجة تانية وهو لازق */\n}\n\n.logo {\n  font-size: 22px;      /* حجم الخط */\n  font-weight: 700;     /* تخانة الخط: 400 عادي، 700 تخين (bold) */\n}\n\n.nav-links {\n  display: flex;        /* اللينكات جنب بعض بدل ما تبقى تحت بعض */\n  gap: 32px;            /* مسافة 32 بكسل بين كل لينك والتاني */\n  list-style: none;     /* نشيل النقط أو الأرقام اللي قبل كل عنصر في القايمة */\n}\n\n.nav-links a {                  /* معناها: أي لينك a موجود جوه .nav-links */\n  opacity: 0.8;                 /* شفافية خفيفة: 1 ظاهر كامل، 0 مختفي خالص */\n  transition: opacity 0.2s, color 0.2s;   /* أي تغيير يحصل بنعومة في 0.2 ثانية بدل ما يقلب فجأة */\n}\n\n.nav-links a:hover {            /* :hover = لما الماوس يقف على اللينك */\n  opacity: 1;\n  color: #E8A33D;               /* يقلب برتقاني دهبي */\n}\n\n\n/* =========================================================\n   الخطوة 3: الأزرار\n   ========================================================= */\n\n.btn {\n  display: inline-block;        /* يفضل في نفس السطر بس يقبل padding من كل الجهات */\n  background-color: #E8A33D;    /* خلفية برتقاني دهبي */\n  color: #1B2433;               /* الكلام كحلي */\n  font-weight: 700;\n  padding: 12px 28px;           /* حجم الزرار بييجي من المسافة الداخلية */\n  border-radius: 999px;         /* رقم كبير = الأطراف مدورة على الآخر (شكل كبسولة) */\n  transition: transform 0.2s, background-color 0.2s;\n}\n\n.btn:hover {\n  background-color: #F2B85C;    /* لون أفتح شوية */\n  transform: translateY(-3px);  /* الزرار يطلع لفوق 3 بكسل كأنه بيترفع */\n}\n\n/* class تانية بتتحط على نفس الزرار عشان نصغره (العنصر ممكن ياخد أكتر من class) */\n.btn-small {\n  padding: 8px 20px;\n  font-size: 14px;\n}\n\n\n/* =========================================================\n   الخطوة 4: الجزء الرئيسي (Hero)\n   ========================================================= */\n\n.hero {\n  display: flex;          /* الكلام والكتاب جنب بعض */\n  align-items: center;    /* متسنترين رأسيا */\n  gap: 64px;              /* مسافة بينهم */\n  max-width: 1100px;      /* أقصى عرض، عشان الكلام ما يتمطش أوي على الشاشات الكبيرة */\n  margin: 0 auto;         /* 0 فوق وتحت، auto يمين وشمال = المحتوى يتسنتر في نص الصفحة */\n  padding: 80px 24px;\n}\n\n.hero-text {\n  flex: 1;                /* ياخد كل المساحة الفاضية اللي فاضلة */\n}\n\n.hero h1 {                /* أي h1 جوه .hero */\n  font-size: 44px;\n  line-height: 1.3;\n  margin-bottom: 16px;    /* مسافة تحت العنوان */\n}\n\n.hero p {\n  font-size: 18px;\n  max-width: 520px;       /* الفقرة ما تعديش 520 بكسل عرض */\n  margin-bottom: 28px;\n}\n\n.book-of-week {\n  text-align: center;     /* الكلام اللي جواه في النص */\n}\n\n/* غلاف كتاب معمول من div بس */\n.book-cover {\n  width: 200px;\n  height: 280px;\n  background-color: #2F6F73;           /* أخضر مزرق */\n  color: #FFFFFF;\n  padding: 24px;\n  border-radius: 12px;\n  border-right: 12px solid #24575A;    /* خط تخين على اليمين شبه كعب الكتاب */\n  display: flex;\n  flex-direction: column;              /* المرة دي العناصر تحت بعض مش جنب بعض */\n  justify-content: space-between;      /* العنوان فوق واسم الكاتب تحت */\n  box-shadow: 0 20px 40px rgba(27, 36, 51, 0.3);  /* ظل: يمين/شمال 0، لتحت 20، مدى التمويه 40، اللون شفاف */\n  transform: rotate(-4deg);            /* نميل الكتاب 4 درجات */\n  margin-bottom: 24px;\n}\n\n.book-cover h2 {\n  font-size: 26px;\n  line-height: 1.4;\n}\n\n.book-label {\n  font-size: 14px;\n  color: #5A6578;          /* رمادي، عشان يبقى أقل أهمية من باقي الكلام */\n}\n\n\n/* =========================================================\n   الخطوة 5: الأقسام وكروت الكتب\n   ========================================================= */\n\n/* class عامة لأي قسم في الصفحة (بنستخدمها مرتين) */\n.section {\n  max-width: 1100px;\n  margin: 0 auto;\n  padding: 64px 24px;\n}\n\n.section-title {\n  font-size: 32px;\n}\n\n.section-subtitle {\n  color: #5A6578;\n  margin-bottom: 40px;\n}\n\n.books-grid {\n  display: grid;                           /* نقسم المكان لشبكة صفوف وأعمدة */\n  grid-template-columns: repeat(3, 1fr);   /* 3 أعمدة متساوية. 1fr = جزء واحد من المساحة */\n  gap: 24px;                               /* المسافة بين الكروت */\n}\n\n.book-card {\n  background-color: #FFFFFF;\n  border: 1px solid #DDE3EA;               /* إطار رفيع: سُمك 1، خط مصمت، لون رمادي فاتح */\n  border-radius: 16px;\n  padding: 20px;\n  transition: transform 0.2s, box-shadow 0.2s;\n}\n\n.book-card:hover {\n  transform: translateY(-6px);                       /* الكارت يطلع لفوق */\n  box-shadow: 0 12px 24px rgba(27, 36, 51, 0.12);    /* ويظهر تحته ظل */\n}\n\n.card-cover {\n  height: 140px;            /* div فاضي، فلازم نديله ارتفاع وإلا مش هيبان */\n  border-radius: 10px;\n  margin-bottom: 16px;\n}\n\n/* لون مختلف لكل غلاف */\n.cover-1 { background-color: #2F6F73; }\n.cover-2 { background-color: #E8A33D; }\n.cover-3 { background-color: #6B4E71; }\n.cover-4 { background-color: #B5523B; }\n.cover-5 { background-color: #34507A; }\n.cover-6 { background-color: #6E7F3A; }\n\n.book-card h3 {\n  font-size: 20px;\n}\n\n.author {\n  color: #5A6578;\n  font-size: 15px;\n  margin-bottom: 12px;\n}\n\n.level {\n  display: inline-block;\n  font-size: 13px;\n  padding: 2px 12px;\n  border-radius: 999px;\n  background-color: #EEF2F6;\n}\n\n\n/* =========================================================\n   الخطوة 6: خطوات الاشتراك\n   ========================================================= */\n\n.steps {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 24px;\n  list-style: none;        /* نشيل الأرقام الافتراضية لأننا عاملين أرقام بشكلنا */\n  margin-bottom: 40px;\n}\n\n.step {\n  background-color: #FFFFFF;\n  border-radius: 16px;\n  padding: 24px;\n}\n\n/* الدايرة اللي فيها الرقم */\n.step-number {\n  width: 48px;\n  height: 48px;              /* العرض = الارتفاع = مربع */\n  border-radius: 50%;        /* 50% بتحول المربع لدايرة */\n  background-color: #1B2433;\n  color: #E8A33D;\n  font-size: 20px;\n  font-weight: 700;\n  display: flex;             /* flex هنا عشان نسنتر الرقم جوه الدايرة */\n  justify-content: center;   /* في النص أفقيا */\n  align-items: center;       /* في النص رأسيا */\n  margin-bottom: 12px;\n}\n\n.join-action {\n  text-align: center;        /* الزرار في نص الصفحة */\n}\n\n\n/* =========================================================\n   الخطوة 7: الفوتر\n   ========================================================= */\n\n.footer {\n  background-color: #1B2433;\n  color: #C9D1DC;\n  text-align: center;\n  padding: 24px;\n  font-size: 14px;\n}\n\n\n/* =========================================================\n   الخطوة 8: الموبايل والتابلت (Responsive)\n   @media معناها: \"طبق الكلام اللي جوايا بس لو الشرط ده صح\"\n   ========================================================= */\n\n/* لو عرض الشاشة 900 بكسل أو أقل (تابلت) */\n@media (max-width: 900px) {\n  .books-grid {\n    grid-template-columns: repeat(2, 1fr);   /* عمودين بدل 3 */\n  }\n}\n\n/* لو عرض الشاشة 768 بكسل أو أقل (موبايل) */\n@media (max-width: 768px) {\n  .navbar {\n    flex-wrap: wrap;            /* لو المكان ما كفاش، العناصر تنزل سطر جديد */\n    justify-content: center;\n    gap: 12px;\n    padding: 12px 20px;\n  }\n\n  .nav-links {\n    gap: 16px;\n  }\n\n  .hero {\n    flex-direction: column;     /* الكلام والكتاب تحت بعض بدل جنب بعض */\n    text-align: center;\n    padding: 48px 20px;\n  }\n\n  .hero h1 {\n    font-size: 32px;            /* عنوان أصغر على الموبايل */\n  }\n\n  .hero p {\n    margin-left: auto;          /* نسنتر الفقرة لأن عرضها محدود */\n    margin-right: auto;\n  }\n\n  .books-grid,\n  .steps {                      /* الفاصلة = طبق نفس الكلام على الاتنين */\n    grid-template-columns: 1fr; /* عمود واحد بس */\n  }\n}\n", "base": "", "widths": true, "tall": true, "hint": "غير لون #E8A33D في كل مكان للون تاني، أو غير repeat(3, 1fr) في .books-grid.", "notes": "ده نفس ملف solution/style.css بالظبط."}, {"id": "mistakes", "group": "المراجعة", "title": "لو حاجة مش شغالة", "intro": ["الكود ده فيه 3 أخطاء متعمدة من الأخطاء الشائعة. شغله، وبعدين حاول تصلحها."], "cards": [["الـ ; ناقصة", "السطر اللي بعدها مش هيشتغل"], ["النقطة ناقصة", "الـ class لازم قبله نقطة: .btn"], ["الاسم مختلف", "لازم يطابق الـ HTML حرف بحرف"], ["القوس ما اتقفلش", "كل القواعد اللي بعده ممكن تبوظ"], ["الملف مش مربوط", "اسم الملف في href لازم يطابق"], ["نسيت تحفظ", "Ctrl + S وبعدين F5"]], "html": "<h1 class=\"title\">عنوان<\/h1>\n<a href=\"#\" class=\"btn\">زرار<\/a>", "code": ".title {\n  color: #2F6F73\n  font-size: 48px;\n}\nbtn {\n  background-color: #E8A33D;\n  padding: 10px 24px;\n}\n.titel {\n  text-decoration: underline;\n}", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}", "hint": "الأخطاء: ; ناقصة بعد اللون، نقطة ناقصة قبل btn، و titel مكتوبة غلط.", "notes": "لما الطالب يقول مش شغال، ما تحلش انت. اسأله: حفظت؟ الـ ; موجودة؟ النقطة موجودة؟ الاسم زي الـ HTML؟"}, {"id": "devtools", "group": "المراجعة", "title": "أدوات المتصفح", "steps": ["كليك يمين على العنصر اللي فيه مشكلة واختار Inspect، أو اضغط F12", "على اليمين في تبويب Styles هتلاقي كل القواعد اللي اتطبقت عليه", "لو القاعدة بتاعتك مش موجودة خالص: يبقى الـ selector غلط", "لو موجودة وعليها شطب: يبقى فيه قاعدة تانية غلبتها", "تقدر تغير أي قيمة هناك وتشوف النتيجة على طول، وبعدها انقل اللي عجبك للملف"], "notes": "التعديلات في أدوات المتصفح مؤقتة وبتروح مع الـ Refresh، فلازم تتنقل للملف.", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}"}, {"id": "rubric", "group": "المراجعة", "title": "التقييم من 20", "table": [["النافبار لازق فوق، وعناصره جنب بعض ومتوزعة", "3"], ["الأزرار شكلها كبسولة وبتتحرك مع الماوس", "2"], ["الجزء الرئيسي: كلام وغلاف جنب بعض ومتسنتر", "3"], ["كروت الكتب 3 عواميد بمسافات متساوية", "4"], ["دواير الخطوات والرقم في نصها", "2"], ["الصفحة شكلها كويس على الموبايل", "4"], ["الكود منظم، ومسافات وأقواس سليمة", "2"]], "notes": "قيم وانت فاتح الصفحة في المتصفح جنب الحل، مش بقراية الكود. مش لازم الألوان تبقى نفس الحل.", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}"}, {"id": "bonus", "group": "المراجعة", "title": "تحديات للي خلص بدري", "intro": ["التحدي الأولاني جاهز تحت: غلاف الكتاب يرجع مستقيم لما الماوس يقف عليه. جربه وبعدين جرب الباقي في المشروع."], "cards": [["زود كارت سابع", "انسخ كارت في الـ HTML وغير اسمه ولونه"], ["الغلاف يتعدل", "‏:hover مع rotate(0deg)"], ["وضع ليلي", "‏@media (prefers-color-scheme: dark)"], ["زرار يطلع لفوق", "‏position: fixed في ركن الشاشة"]], "html": "<div class=\"book-cover\"><h2>حي بن يقظان<\/h2><p>ابن طفيل<\/p><\/div>", "code": ".book-cover {\n  width: 160px;\n  height: 220px;\n  margin: 30px;\n  background-color: #2F6F73;\n  color: #FFFFFF;\n  padding: 20px;\n  border-radius: 12px;\n  transform: rotate(-4deg);\n  transition: transform 0.3s;\n}\n.book-cover:hover {\n  transform: rotate(0deg) scale(1.05);\n}", "base": "*{margin:0;padding:0;box-sizing:border-box} body{font-family:'Cairo',Tahoma,sans-serif;color:#1B2433;background:#EEF2F6;line-height:1.7;padding:20px} a{color:inherit;text-decoration:none}", "notes": "الوضع الليلي فكرته إن @media مش للمقاس بس، ممكن تسأل كمان هل المستخدم مشغل الوضع الليلي."}];
+const FONT = '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">';
+let cur = 0;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- الأجندة ---------- */
+function buildToc(){
+  let html = '', g = null;
+  T.forEach((t,i) => {
+    if (t.group !== g){ if (g !== null) html += '</ul>'; g = t.group; html += `<p class="group">${esc(g)}</p><ul class="toc">`; }
+    html += `<li><button data-i="${i}"><span class="n">${i+1}</span><span>${esc(t.title)}</span></button></li>`;
+  });
+  $('#toc').innerHTML = html + '</ul>';
+  $('#toc').addEventListener('click', e => { const b = e.target.closest('button[data-i]'); if (b) go(+b.dataset.i); });
+}
+
+/* ---------- رسم السلايد ---------- */
+function render(){
+  const t = T[cur];
+  let h = `<div class="grp">${esc(t.group)}</div><h2>${esc(t.title)}</h2>`;
+  if (t.intro) h += '<div class="intro">' + t.intro.map(p => `<p>${esc(p)}</p>`).join('') + '</div>';
+  if (t.kind === 'agenda'){
+    let g = null;
+    T.forEach((x,i) => {
+      if (i === 0) return;
+      if (x.group !== g){ if (g) h += '</div></div>'; g = x.group; h += `<div class="agenda-group"><h3>${esc(g)}</h3><div class="agenda-cards">`; }
+      h += `<button data-go="${i}"><span class="n">${i+1}</span><span>${esc(x.title)}</span></button>`;
+    });
+    h += '</div></div>';
+  }
+  if (t.kind === 'map'){
+    const b = (hgt,bg,fg,cls,step) => `<div style="height:${hgt}px;background:${bg};color:${fg}"><span>الخطوة ${step}</span><code>${cls}</code></div>`;
+    h += '<div class="map">' + b(48,'#1B2433','#F2F4F7','.navbar',2) + b(110,'#D9E6E6','#1B2433','.hero',4) + b(120,'#F6E3C2','#1B2433','.books-grid',5) + b(80,'#E2DBE6','#1B2433','.steps',6) + b(44,'#1B2433','#F2F4F7','.footer',7) + '</div>';
+  }
+  if (t.cards) h += '<div class="cards">' + t.cards.map(c => `<div class="card"><h3>${esc(c[0])}</h3><p>${esc(c[1])}</p></div>`).join('') + '</div>';
+  if (t.rows) h += '<div class="rows">' + t.rows.map(r => `<div class="row"><code>${esc(r[0])}</code><span>${esc(r[1])}</span></div>`).join('') + '</div>';
+  if (t.steps) h += '<ol class="steps-list">' + t.steps.map((s,i) => `<li><span class="dot">${i+1}</span><span>${esc(s)}</span></li>`).join('') + '</ol>';
+  if (t.table){
+    h += '<table><tr><th>المعيار</th><th style="text-align:center">الدرجة</th></tr>' + t.table.map(r => `<tr><td>${esc(r[0])}</td><td class="d">${esc(r[1])}</td></tr>`).join('') + '<tr class="total"><td>المجموع</td><td class="d">20</td></tr></table>';
+  }
+  if (t.code !== undefined){
+    const sizes = t.widths ? `<button class="tool" data-w="1100" aria-pressed="true">كمبيوتر</button><button class="tool" data-w="800" aria-pressed="false">تابلت</button><button class="tool" data-w="375" aria-pressed="false">موبايل</button>` : '';
+    h += `<div class="lab${t.tall ? ' tall' : ''}">
+      <div class="panel">
+        <div class="bar"><span class="label">الكود (CSS) — تقدر تعدل فيه</span>
+          <button class="tool run" id="runBtn" title="Ctrl + Enter">▶ تشغيل</button>
+          <button class="tool" id="copyBtn">نسخ</button>
+          <button class="tool" id="resetBtn">رجوع للأصل</button></div>
+        <textarea class="code" id="code" spellcheck="false" aria-label="كود CSS"></textarea>
+      </div>
+      <div class="panel">
+        <div class="bar"><span class="label">النتيجة</span>${sizes}</div>
+        <div class="preview-wrap" id="pwrap"><iframe id="frame" title="نتيجة الكود" sandbox></iframe></div>
+      </div>
+    </div>`;
+  }
+  if (t.hint) h += `<div class="hint"><b>جرب بإيدك:</b> ${esc(t.hint)}</div>`;
+  if (t.notes) h += `<details class="notes"><summary>ملاحظات للي بيشرح</summary><p>${esc(t.notes)}</p></details>`;
+  const p = T[cur-1], n = T[cur+1];
+  h += '<div class="bottom-nav">' +
+    (p ? `<button data-go="${cur-1}"><small>→ السابق</small>${esc(p.title)}</button>` : '<span></span>') +
+    (n ? `<button class="next" data-go="${cur+1}"><small>التالي ←</small>${esc(n.title)}</button>` : '<span></span>') + '</div>';
+  $('#slide').innerHTML = h;
+
+  if (t.code !== undefined){
+    const ta = $('#code');
+    ta.value = t._edited ?? t.code;
+    ta.addEventListener('input', () => { t._edited = ta.value; });
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Tab'){ e.preventDefault(); const s = ta.selectionStart; ta.setRangeText('  ', s, ta.selectionEnd, 'end'); t._edited = ta.value; }
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); run(); }
+    });
+    $('#runBtn').onclick = run;
+    $('#copyBtn').onclick = () => copy(ta.value);
+    $('#resetBtn').onclick = () => { ta.value = t.code; delete t._edited; run(); toast('رجع للكود الأصلي'); };
+    document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => {
+      document.querySelectorAll('[data-w]').forEach(x => x.setAttribute('aria-pressed', x === b));
+      t._w = +b.dataset.w; fit();
+    });
+    if (t._w) document.querySelectorAll('[data-w]').forEach(x => x.setAttribute('aria-pressed', +x.dataset.w === t._w));
+    run();
+  }
+
+  document.querySelectorAll('#toc button').forEach(b => b.setAttribute('aria-current', +b.dataset.i === cur));
+  const active = document.querySelector('#toc button[aria-current="true"]');
+  if (active) active.scrollIntoView({block:'nearest'});
+  $('#crumb').innerHTML = `${esc(t.group)} / <b>${esc(t.title)}</b>`;
+  $('#count').textContent = `${cur+1} / ${T.length}`;
+  $('#prog').style.width = ((cur+1)/T.length*100) + '%';
+  $('#prevBtn').disabled = cur === 0;
+  $('#nextBtn').disabled = cur === T.length-1;
+  $('#scroll').scrollTop = 0;
+  document.title = t.title + ' | دليل مشروع CSS';
+}
+
+/* ---------- تشغيل الكود ---------- */
+function run(){
+  const t = T[cur], f = $('#frame');
+  if (!f) return;
+  f.srcdoc = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">${FONT}<style>${t.base || ''}</style><style>${$('#code').value}</style></head><body>${t.html || ''}</body></html>`;
+  fit();
+}
+function fit(){
+  const t = T[cur], f = $('#frame'), w = $('#pwrap');
+  if (!f) return;
+  const H = t.tall ? 640 : 420;
+  const avail = w.clientWidth;
+  const W = t.widths ? (t._w || 1100) : avail;
+  const s = Math.min(1, avail / W);
+  f.style.width = W + 'px';
+  f.style.height = (H / s) + 'px';
+  f.style.transform = `scale(${s})`;
+  f.style.marginRight = s < 1 ? '0' : ((avail - W) / 2) + 'px';
+  w.style.height = H + 'px';
+}
+async function copy(text){
+  try { await navigator.clipboard.writeText(text); toast('اتنسخ ✓'); }
+  catch(e){
+    const ta = $('#code'); ta.focus(); ta.select();
+    try { document.execCommand('copy'); toast('اتنسخ ✓'); } catch(_) { toast('علم على الكود واضغط Ctrl + C'); }
+  }
+}
+let tt;
+function toast(m){ const el = $('#toast'); el.textContent = m; el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 1600); }
+
+/* ---------- التنقل ---------- */
+function go(i){
+  if (i < 0 || i >= T.length) return;
+  cur = i; render(); closeMenu();
+  try { history.replaceState(null, '', '#' + T[i].id); } catch(e){}
+}
+function closeMenu(){ $('#side').classList.remove('open'); $('#scrim').classList.remove('show'); }
+$('#prevBtn').onclick = () => go(cur-1);
+$('#nextBtn').onclick = () => go(cur+1);
+$('#menuBtn').onclick = () => { $('#side').classList.add('open'); $('#scrim').classList.add('show'); };
+$('#scrim').onclick = closeMenu;
+$('#slide').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(+b.dataset.go); });
+document.addEventListener('keydown', e => {
+  if (e.target.closest('textarea, input')) return;
+  if (e.key === 'ArrowLeft') go(cur+1);   // الصفحة عربي: الشمال = التالي
+  if (e.key === 'ArrowRight') go(cur-1);
+});
+window.addEventListener('resize', fit);
+
+buildToc();
+const start = T.findIndex(t => '#' + t.id === location.hash);
+go(start >= 0 ? start : 0);
+</script>
+</body>
+</html>
